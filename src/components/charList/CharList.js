@@ -1,6 +1,7 @@
 
 import { Component } from 'react';
-
+import Spinner from '../spinner/spinner';
+import ErrorMessage from '../errorMessage/errorMessage';
 import MarvelService from '../../services/MarvelService';
 import './charList.scss';
 
@@ -10,53 +11,68 @@ class CharList extends Component {
         loading: true,
         error: false
     };
-    
+
     marvelService = new MarvelService();
 
     componentDidMount() {
-        this.updateChar();
+        this.updateCharList();    
     }
 
-    onCharLoaded = (charList) => {
+    onRequest = (offset) => {
+        this.marvelService.getAllCharacters(offset)
+            .then(this.onCharListLoaded)  
+            .catch(this.onError)   
+
+    }
+
+    updateCharList = () => {
+        this.marvelService.getAllCharacters()
+            .then(this.onCharListLoaded)  
+            .catch(this.onError)   
+    }
+
+    onCharListLoaded = (charList) => {
         this.setState({
-            charList     /// char === char : char
-        })
-        
+            charList,  /// char === char : char
+            loading: false    
+        })  
     }
 
-    updateChar = () => {
-        this.marvelService  
-            .getAllCharacters()
-            // .then(res => {
-            //     this.setState(res)
-            //     console.log(res);
-            // })
-            .then(this.onCharLoaded)
-            
+    onError = () => {
+        this.setState({
+            error: true,
+            loading: false 
+        })
     }
 
     render() {
-        const {charList, res} = this.state
-        // console.log(charList);
-        // console.log(res)
+        const {charList, loading, error} = this.state
+       
         
+        const list = <ListItem charList={charList} onCharSelected={this.props.onCharSelected}/>
+        const errorMessage = error ? <ErrorMessage/> : null;
+        const spinner = loading ? <Spinner/> : null;
+        const content = !(loading || error) ? list : null;
+
         return (
             <div className="char__list">
-                <ListItem charList={charList}/>
+                {errorMessage}
+                {spinner}
+                {content}
                 <button className="button button__main button__long">
                     <div className="inner">load more</div>
                 </button>
             </div>
         )
     }
-   
 }
 
 const ListItem = (props) => {
     const charList = props.charList
+    const CharId = props.onCharSelected
     
-    const itemOfList = charList.map((item, i) => 
-        <li key={i++} className="char__item">
+    const itemOfList = charList.map((item) => 
+        <li className="char__item" key={item.id} onClick={() => CharId(item.id)}>
             <img src={item.thumbnail} style={item.thumbnail.includes("image_not_available.jpg") ? {objectFit: "contain"} : null} alt="abyss"/>
             <div className="char__name">{item.name}</div>
         </li> 
@@ -66,35 +82,6 @@ const ListItem = (props) => {
             {itemOfList}
         </ul> 
     )
-
-    
-
-
-    // const {name, description, thumbnail, homepage, wiki} = charList
-    // const itemOfList = charList.map((item) => 
-    //     <li className="char__item">
-    //         <img src={item.thumbnail} alt="abyss"/>
-    //         <div className="char__name">{item.name}</div>
-    //      </li> 
-    // )
-    // return itemOfList
-
-    // const numbers = [1, 2, 3, 4, 5];
-    // const listItems = numbers.map((number) =>
-    // <li>{number}</li>
-    // );
-
-    // return listItems
-    
-
-   
-    // const {name, description, thumbnail, homepage, wiki} = charList
-    // return (
-    //     <li className="char__item">
-    //         <img src={thumbnail} alt="abyss"/>
-    //         <div className="char__name">{name}</div>
-    //     </li>
-    // )
 }
 
 export default CharList;
