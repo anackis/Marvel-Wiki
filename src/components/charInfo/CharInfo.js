@@ -1,9 +1,10 @@
 
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Spinner from '../spinner/spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
-import Skeleton from '../skeleton/Skeleton'
 import useMarvelService from '../../services/MarvelService';
+import Skeleton from '../skeleton/Skeleton'
 import './charInfo.scss';
 
 const CharInfo = (props) => {
@@ -51,6 +52,9 @@ const CharInfo = (props) => {
 const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki, comics} = char;
     const style = thumbnail.includes("image_not_available.jpg") ? {objectFit: "contain"} : null;
+    const comicIdFromList = comics.length === 0 ? '' : comics[0].resourceURI.substring(43);
+    
+
     return (
         <>
             <div className="char__basics">
@@ -74,7 +78,9 @@ const View = ({char}) => {
                     comics.slice(0,10).map((item, i) => {
                         return(
                         <li className="char__comics-item" key={i}>
-                            {item.name}
+                            <Link to={`/comics/${comicIdFromList}`}>
+                                {item.name}
+                            </Link>
                         </li>
                         )
                     })
