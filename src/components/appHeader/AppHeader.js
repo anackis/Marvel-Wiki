@@ -13,8 +13,7 @@ const AppHeader = () => {
             <nav className="app__menu">
                 <ul>
                     <li><NavLink 
-                        end="true" 
-                        // activeStyle={({ isActive }) => ({ color: isActive ? "#9f0013" : "black"})}
+                        // end="true" 
                         style={({ isActive }) => ({ color: isActive ? "#9f0013" : "black"})}
                         to="/">Characters
                     </NavLink></li>
