@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 
+import setConent from '../../utils/setContent';
 import Spinner from '../spinner/spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
 import useMarvelService from '../../services/MarvelService';
@@ -12,7 +13,7 @@ const CharList = (props) => {
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
 
-    const {loading, error, getAllCharacters} = useMarvelService();
+    const {loading, error, getAllCharacters, process, setProcess} = useMarvelService();
 
     useEffect(() => {
         updateCharList(offset, true);
@@ -23,6 +24,7 @@ const CharList = (props) => {
         initial ? setNewItemLoading(false) : setNewItemLoading(true);
         getAllCharacters(offset)
             .then(onCharListLoaded)  
+            .then(() => setProcess('confirmed'))
     }
 
     const onCharListLoaded = (newCharList) => {
@@ -63,30 +65,30 @@ const CharList = (props) => {
 const ListItem = (props) => {
     const [activeIndex, setActiveIndex] = useState(null);
     
-        const charList = props.charList
-        const charId = props.onCharSelected
- 
-        const handleClick = (i) => {
-            setActiveIndex(i);
-        }
-    
-        const itemOfList = charList.map((item, i) => 
-        <li 
-            className={activeIndex === i ? 'char__item char__item_selected' : 'char__item'}
-            key={item.id} 
-            onClick={() => {
-                charId(item.id);
-                handleClick(i);
-            }}>
-            <img src={item.thumbnail} style={item.thumbnail.includes("image_not_available.jpg") ? {objectFit: "contain"} : null} alt="abyss"/>
-            <div className="char__name">{item.name}</div>
-        </li> 
+    const charList = props.charList
+    const charId = props.onCharSelected
+
+    const handleClick = (i) => {
+        setActiveIndex(i);
+    }
+
+    const itemOfList = charList.map((item, i) => 
+    <li 
+        className={activeIndex === i ? 'char__item char__item_selected' : 'char__item'}
+        key={item.id} 
+        onClick={() => {
+            charId(item.id);
+            handleClick(i);
+        }}>
+        <img src={item.thumbnail} style={item.thumbnail.includes("image_not_available.jpg") ? {objectFit: "contain"} : null} alt="abyss"/>
+        <div className="char__name">{item.name}</div>
+    </li> 
     )
-        return (
-            <ul className="char__grid">
-                {itemOfList}
-            </ul> 
-        )
+    return (
+        <ul className="char__grid">
+            {itemOfList}
+        </ul> 
+    )
 }
 
 export default CharList;

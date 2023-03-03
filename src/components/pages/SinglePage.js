@@ -30,14 +30,12 @@ const SinglePage = ({Component, dataType}) => {
     switch (dataType) {
       case 'comic':
         getComic(id).then(onDataLoaded);
-        // console.log('comic');
         break;
       case 'character':
         getCharacter(id).then(onDataLoaded); 
-        // console.log('char');
         break;
-      // default:
-      //   /// do nothing
+      default: 
+        console.log("Unexpected error")
     }
     /* eslint-disable */
   }
