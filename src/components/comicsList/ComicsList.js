@@ -8,13 +8,34 @@ import useMarvelService from '../../services/MarvelService';
 import './comicsList.scss';
 import './comicsList.scss';
 
+
+const setConent = (process, Component, newItemLoading) => {
+    switch (process) {
+        case 'waiting': 
+            return <Spinner/>;
+            // break;
+        case 'loading':
+            return newItemLoading ? <Component/> : <Spinner/>;
+            // break;
+        case 'confirmed':
+            return <Component/>;
+            // break;
+        case 'error':
+            return <ErrorMessage/>;
+            // break;
+        default: 
+            throw new Error('Unexpected process state');
+    }
+}
+
+
 const ComicsList = () => {
     const [comicsList, setComicsList] = useState([]);
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [comicsOffset, setComicsOffset] = useState(20000);
     const [comicsEnded, setComicsEnded] = useState(false);
 
-    const {loading, error, getAllComics} = useMarvelService();
+    const {getAllComics, process, setProcess} = useMarvelService();
 
     useEffect(() => {
         updateComicsList(comicsOffset, true);
@@ -25,6 +46,7 @@ const ComicsList = () => {
         initial ? setNewItemLoading(false) : setNewItemLoading(true);
         getAllComics(comicsOffset)
             .then(onComicsListLoaded)
+            .then(() => setProcess('confirmed'))
     }
 
     const onComicsListLoaded = (newComicsList) => {
@@ -40,14 +62,15 @@ const ComicsList = () => {
     }
 
     const list = <ComicsListItem comicsList={comicsList}/>
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading && !newItemLoading ? <Spinner/> : null;
+    // const errorMessage = error ? <ErrorMessage/> : null;
+    // const spinner = loading && !newItemLoading ? <Spinner/> : null;
 
     return (
         <div className="comics__list">
-            {list}
-            {errorMessage}
-            {spinner}
+            {setConent(process, () => list, newItemLoading)}
+            {/* {list} */}
+            {/* {errorMessage}
+            {spinner} */}
             <button 
                 className="button button__main button__long"
                 disabled={newItemLoading}
