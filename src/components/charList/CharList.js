@@ -1,7 +1,6 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
-// import setConent from '../../utils/setContent';
 import Spinner from '../spinner/spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
 import useMarvelService from '../../services/MarvelService';
@@ -63,12 +62,17 @@ const CharList = (props) => {
     // const errorMessage = error ? <ErrorMessage/> : null;
     // const spinner = loading && !newItemLoading ? <Spinner/> : null;
 
+    const elements = useMemo(() => {
+        return setConent(process, () => ListItem(charList, props.onCharSelected), newItemLoading)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [process]);
+
     return (
         <div className="char__list">
             {/* {errorMessage}
             {spinner} */}
             {/* {list} */}
-            {setConent(process, () => ListItem(charList, props.onCharSelected), newItemLoading)}
+            {elements}
             <button 
                 className="button button__main button__long"
                 disabled={newItemLoading}
